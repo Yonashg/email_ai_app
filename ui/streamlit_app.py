@@ -1,9 +1,15 @@
+import sys
+import os
+# Add project root to sys.path so imports always work
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 # ui/streamlit_app.py
 import streamlit as st
 from models.categorize import categorize_email
 from models.summarize import summarize_email
 from services.ollama_reply import draft_reply
 from db.database import init_db, insert_email, fetch_emails
+
+
 
 # Initialize database
 init_db()
