@@ -1,3 +1,6 @@
-streamlit
-transformers
-torch
+streamlit        # for building the web app
+transformers     # for working with language models         
+torch            # required for transformers
+ollama           # official Ollama Python client
+python-dotenv    # for loading Gmail App password from .env
+sqlite-utils     # optional, but makes working with SQLite easier

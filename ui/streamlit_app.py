@@ -9,7 +9,7 @@ from models.categorize import categorize_email
 from models.summarize import summarize_email
 from services.ollama_reply import draft_reply
 from db.database import init_db, insert_email, fetch_emails
-from models.fetch_gmail import fetch_emails as fetch_from_gmail
+from services.fetch_gmail import fetch_emails as fetch_from_gmail
 
 
 # -----------------------------
@@ -18,6 +18,7 @@ from models.fetch_gmail import fetch_emails as fetch_from_gmail
 init_db()
 st.set_page_config(page_title="AI Email Assistant", layout="wide")
 st.title("📧 AI Email Assistant")
+
 
 # -----------------------------
 # Helper to process an email
@@ -66,7 +67,9 @@ with tab1:
                 st.warning("Please paste an email first!")
 
     elif mode == "Fetch from Gmail":
-        num_emails = st.number_input("Number of latest emails to fetch", min_value=1, max_value=20, value=5)
+        num_emails = st.number_input(
+            "Number of latest emails to fetch", min_value=1, max_value=20, value=1
+        )
         if st.button("Fetch & Process"):
             try:
                 emails = fetch_from_gmail(n=num_emails)
@@ -74,10 +77,14 @@ with tab1:
                     st.info("No emails found in your Gmail inbox.")
                 else:
                     for i, email_data in enumerate(emails, start=1):
-                        st.markdown(f"#### Email {i}: {email_data['subject']}")
-                        st.write("From:", email_data["from"])
-                        st.write("Body (first 500 chars):", email_data["body"][:500], "...")
-                        process_email(email_data["body"])
+                        subject = email_data.get("subject") or "(No subject)"
+                        sender = email_data.get("from") or "(Unknown sender)"
+                        body_preview = email_data.get("body") or "(No content found)"  # ✅ fallback
+
+                        st.markdown(f"#### Email {i}: {subject}")
+                        st.write("From:", sender)
+                        st.write("Body (first 500 chars):", body_preview[:500], "...")
+                        process_email(body_preview)
                         st.divider()
             except Exception as e:
                 st.error(f"Failed to fetch emails: {e}")
